@@ -81,13 +81,13 @@ jobs:
 
       - name: Create release branch and bump version
         run: |
-          BRANCH=release/${{ steps.get_latest_tag.output }} # - pyrodactyl uses a different scheme for its branches - never mind
+          BRANCH=release/${{ steps.get_latest_tag.outputs.* }} # - pyrodactyl uses a different scheme for its branches - never mind
           # BRANCH=main
           git config --local user.email "naterfute@pyro.host"
           git config --local user.name "Pyrodactyl CI"
           git checkout -b $BRANCH
           git push -u origin $BRANCH
-          sed -i "s/'version' => '[0-9]\+\.[0-9]\+\.[0-9]\+',/'version' => '${{ steps.get_latest_tag.output }}:1',/" config/app.php
+          sed -i "s/'version' => '[0-9]\+\.[0-9]\+\.[0-9]\+',/'version' => '${{ steps.get_latest_tag.outputs.* }}:1',/" config/app.php
           git add config/app.php
           git commit -m "ci(release): bump version"
           git push
@@ -100,7 +100,7 @@ jobs:
       - name: Extract changelog
         run: |
           echo "This changelog was automatically pulled. It is not guaranteed to be accurate." # Thanks, GitHub Copilot, that's great wording!
-          sed -n "/^## ${{ steps.get_latest_tag.output }}/,/^## /{/^## /b;p}" CHANGELOG.md > ./RELEASE_CHANGELOG
+          sed -n "/^## ${{ steps.get_latest_tag.outputs.* }}/,/^## /{/^## /b;p}" CHANGELOG.md > ./RELEASE_CHANGELOG
 
       - name: Create checksum and add to changelog
         run: |
@@ -114,7 +114,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_name: ${{ steps.get_latest_tag.output }}
+          release_name: ${{ steps.get_latest_tag.outputs.* }}
           draft: true
           prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
           body_path: ./RELEASE_CHANGELOG

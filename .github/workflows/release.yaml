@@ -8,7 +8,7 @@ on:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write # write is required to create releases and push.
     steps:
@@ -27,16 +27,53 @@ jobs:
       - name: Build
         run: yarn build:production
 
+      - name: Auto-increment and push new tag if none exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch all tags
+          git fetch --tags
+
+          # Check if the current push includes a tag
+          if [ -z "${GITHUB_REF##refs/tags/*}" ]; then
+            echo "A tag already exists for this push: ${GITHUB_REF}"
+            exit 0
+          fi
+
+          # Get the latest tag in the vx.x.x format
+          LATEST_TAG=$(git tag --list "v*" --sort=-v:refname | head -n 1)
+
+          # If no tag exists, start with v0.0.1
+          if [ -z "$LATEST_TAG" ]; then
+            NEW_TAG="v0.0.1"
+          else
+            # Extract the major, minor, and patch numbers
+            MAJOR=$(echo $LATEST_TAG | cut -d. -f1 | tr -d 'v')
+            MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+            PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+
+            # Increment the patch version
+            PATCH=$((PATCH + 1))
+
+            # Create the new tag
+            NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          fi
+
+          # Push the new tag
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+
       - name: Create release branch and bump version
         env:
           REF: ${{ github.ref }}
         run: |
-          BRANCH=release/${REF:10}
-          git config --local user.email "ci@pterodactyl.io"
-          git config --local user.name "Pterodactyl CI"
+          # BRANCH=release/${REF:10} - pyrodactyl uses a different scheme for its branches
+          BRANCH=main
+          git config --local user.email "naterfute@pyro.host"
+          git config --local user.name "Pyrodactyl CI"
           git checkout -b $BRANCH
           git push -u origin $BRANCH
-          sed -i "s/    'version' => 'canary',/    'version' => '${REF:11}',/" config/app.php
+          sed -i "s/    'version' => 'v[0-9]\+\.[0-9]\+\.[0-9]\+',/    'version' => '${REF:11}',/" config/app.php
           git add config/app.php
           git commit -m "ci(release): bump version"
           git push

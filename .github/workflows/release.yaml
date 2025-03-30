@@ -71,8 +71,8 @@ jobs:
         env:
           REF: ${{ github.ref }}
         run: |
-          # BRANCH=release/${REF:10} - pyrodactyl uses a different scheme for its branches
-          BRANCH=main
+          BRANCH=release/${REF:10} - pyrodactyl uses a different scheme for its branches - never mind
+          # BRANCH=main
           git config --local user.email "naterfute@pyro.host"
           git config --local user.name "Pyrodactyl CI"
           git checkout -b $BRANCH

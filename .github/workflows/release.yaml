@@ -69,7 +69,7 @@ jobs:
 
       - name: Create release branch and bump version
         env:
-          REF: ${git ref}
+          REF: ${git fetch --tags > /dev/null && git tag --list "v*" --sort=-v:refname | head -n 1}
         run: |
           BRANCH=release/${REF:11} # - pyrodactyl uses a different scheme for its branches - never mind
           # BRANCH=main

@@ -29,7 +29,7 @@ jobs:
         run: npm install --frozen-lockfile
 
       - name: Build
-        run: npm run build:production
+        run: npm run build
 
       - name: Auto-increment and push new tag if none exists
         env:

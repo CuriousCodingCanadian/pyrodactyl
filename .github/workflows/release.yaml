@@ -45,7 +45,7 @@ jobs:
           fi
 
           # Get the latest tag in the vX.X.X format
-          LATEST_TAG=$(git tag --list "v*" --sort=-v:refname | head -n 1)
+          LATEST_TAG=$(git tag --list "v*" | sort -V | tail -n 1)
 
           # If no tag exists, start with v0.0.1
           if [ -z "$LATEST_TAG" ]; then
@@ -70,14 +70,15 @@ jobs:
       - name: Create release branch and bump version
         run: |
           git fetch --tags
-          LATEST_TAG=$(git tag --list "v*" --sort=-v:refname | head -n 1)
+          LATEST_TAG=$(git tag --list "v*" | sort -V | tail -n 1)
+          echo "Latest tag: $LATEST_TAG"
           BRANCH=release/${LATEST_TAG} # - pyrodactyl uses a different scheme for its branches - never mind
           # BRANCH=main
           git config --local user.email "naterfute@pyro.host"
           git config --local user.name "Pyrodactyl CI"
           git checkout -b $BRANCH
           git push -u origin $BRANCH
-          sed -i "s/    'version' => 'v[0-9]\+\.[0-9]\+\.[0-9]\+',/    'version' => '${LATEST_TAG}',/" config/app.php
+          sed -i "s/'version' => 'v[0-9]\+\.[0-9]\+\.[0-9]\+',/'version' => '$LATEST_TAG',/" config/app.php
           git add config/app.php
           git commit -m "ci(release): bump version"
           git push

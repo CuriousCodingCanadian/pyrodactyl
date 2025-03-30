@@ -69,15 +69,15 @@ jobs:
 
       - name: Create release branch and bump version
         env:
-          REF: ${git fetch --tags > /dev/null && git tag --list "v*" --sort=-v:refname | head -n 1}
+          LATEST_TAG: ${git fetch --tags > /dev/null && git tag --list "v*" --sort=-v:refname | head -n 1}
         run: |
-          BRANCH=release/${REF:11} # - pyrodactyl uses a different scheme for its branches - never mind
+          BRANCH=release/${LATEST_TAG:11} # - pyrodactyl uses a different scheme for its branches - never mind
           # BRANCH=main
           git config --local user.email "naterfute@pyro.host"
           git config --local user.name "Pyrodactyl CI"
           git checkout -b $BRANCH
           git push -u origin $BRANCH
-          sed -i "s/    'version' => 'v[0-9]\+\.[0-9]\+\.[0-9]\+',/    'version' => '${REF:11}',/" config/app.php
+          sed -i "s/    'version' => 'v[0-9]\+\.[0-9]\+\.[0-9]\+',/    'version' => '${LATEST_TAG:11}',/" config/app.php
           git add config/app.php
           git commit -m "ci(release): bump version"
           git push

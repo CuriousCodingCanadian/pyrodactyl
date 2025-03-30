@@ -40,7 +40,7 @@ jobs:
             exit 0
           fi
 
-          # Get the latest tag in the vx.x.x format
+          # Get the latest tag in the vX.X.X format
           LATEST_TAG=$(git tag --list "v*" --sort=-v:refname | head -n 1)
 
           # If no tag exists, start with v0.0.1

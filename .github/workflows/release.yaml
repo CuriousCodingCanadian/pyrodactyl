@@ -114,7 +114,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_name: ${{ steps.get_latest_tag.outputs.latest_tag }}
+          name: ${{ steps.get_latest_tag.outputs.latest_tag }}
           draft: true
           prerelease: ${{ contains(github.ref, 'rc') || contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
           body_path: ./RELEASE_CHANGELOG

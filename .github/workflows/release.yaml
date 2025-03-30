@@ -68,9 +68,9 @@ jobs:
           git push origin $NEW_TAG
 
       - name: Create release branch and bump version
-        env:
-          LATEST_TAG: ${git fetch --tags && git tag --list "v*" --sort=-v:refname | head -n 1}
         run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag --list "v*" --sort=-v:refname | head -n 1)
           BRANCH=release/${LATEST_TAG} # - pyrodactyl uses a different scheme for its branches - never mind
           # BRANCH=main
           git config --local user.email "naterfute@pyro.host"

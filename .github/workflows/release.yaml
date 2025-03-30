@@ -78,7 +78,7 @@ jobs:
           git config --local user.name "Pyrodactyl CI"
           git checkout -b $BRANCH
           git push -u origin $BRANCH
-          sed -i "s/'version' => 'v[0-9]\+\.[0-9]\+\.[0-9]\+',/'version' => '$LATEST_TAG',/" config/app.php
+          sed -i "s/'version' => '[0-9]\+\.[0-9]\+\.[0-9]\+',/'version' => '$LATEST_TAG:1',/" config/app.php
           git add config/app.php
           git commit -m "ci(release): bump version"
           git push

@@ -23,13 +23,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
+          cache: npm
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm install --frozen-lockfile
 
       - name: Build
-        run: yarn build:production
+        run: npm build:production
 
       - name: Auto-increment and push new tag if none exists
         env:

@@ -89,10 +89,13 @@ jobs:
           tar -czf panel.tar.gz * .editorconfig .env.example .gitignore .prettierrc.json
 
       - name: Extract changelog
-        env:
-          REF: ${{ github.ref }}
         run: |
-          sed -n "/^## ${REF:10}/,/^## /{/^## /b;p}" CHANGELOG.md > ./RELEASE_CHANGELOG
+          # Get latest tag
+          git fetch --tags
+          LATEST_TAG=$(git tag --list "v*" | sort -V | tail -n 1)
+
+          echo "This changelog was automatically pulled. It is not guaranteed to be accurate." # Thanks, GitHub Copilot, that's great wording!
+          sed -n "/^## ${LATEST_TAG}/,/^## /{/^## /b;p}" CHANGELOG.md > ./RELEASE_CHANGELOG
 
       - name: Create checksum and add to changelog
         run: |
